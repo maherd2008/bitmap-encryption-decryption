@@ -52,7 +52,7 @@ public class encryptor {
 		catch(IOException e){} 
 	}
 
-	public int[] convertToInt(byte[] in, int len) {
+	public static int[] convertToInt(byte[] in, int len) { //i made these static so I could access them in decryptor.java
 		//in is already populated and sized 		
 		int[] out = new int[len];//Create ne int array and store it in out. This will be returned as a new int array when done
 		for (int i=0;i<len;i++) {
@@ -61,7 +61,7 @@ public class encryptor {
 		return out;//Return out		
 	}	
 
-	public void randomize(int[] in, int len) {
+	public static void randomize(int[] in, int len) {
         long seed = (in[34]*7-4)+(in[9]*952+12);
         Random random = new Random(seed);
 		int randnum = 0;
@@ -79,12 +79,11 @@ public class encryptor {
 	}
 		
 	public void encrypt() {
-    	int bpos = 0; // current pixel byte
-    	int cbyte = 0; // current byte from message
-    	int pow = 1; // power of 2
-    	int digit = 0; // current bit
+    	int bpos = 0; //current pixel byte
+    	int cbyte = 0; //current byte from message
+    	int pow = 1; //power of 2
+    	int digit = 0; //current bit
 
-    	// Encrypt the message
     	for (int i = 0; i < msgsize; i++) {
         	cbyte = message[i];
         	pow = 1;
@@ -99,8 +98,7 @@ public class encryptor {
         	}
     	}
 
-    	// Add the stop flag byte (11111111)
-    	cbyte = 0xFF; // flag byte
+    	cbyte = 0xFF;  
     	pow = 1;
 
     	for (int j = 1; j < 9; j++) {
@@ -111,5 +109,10 @@ public class encryptor {
         	body[bpos] = (body[bpos] & 0xFE) | digit;
         	bpos++;
     	}
+		/* this block wasn't in the original code and isn't necessarily an error but I was getting annoyed that the decryptor
+		would correctly translate the message but would then attempt to read the rest of the bytes (most of which were random
+		ascii characters) so the output text file would be the message followed by hundreds of lines of gibberish. All this does
+		is once the message is transcibed to the image it appends a 0xFF byte (11111111 in binary) that the decryptor scans for.
+		0xFF doesn't translate to any letter or symbol so it will in theory never cause any false flags. */
 	}
 }
